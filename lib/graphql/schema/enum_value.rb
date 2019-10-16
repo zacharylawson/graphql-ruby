@@ -29,6 +29,7 @@ module GraphQL
       include GraphQL::Schema::Member::AcceptsDefinition
       include GraphQL::Schema::Member::HasPath
       include GraphQL::Schema::Member::HasAstNode
+      include GraphQL::Schema::Member::HasDirectives
 
       attr_reader :graphql_name
 

@@ -15,6 +15,7 @@ module GraphQL
       include GraphQL::Schema::Member::HasArguments
       include GraphQL::Schema::Member::HasAstNode
       include GraphQL::Schema::Member::HasPath
+      include GraphQL::Schema::Member::HasDirectives
 
       # @return [String] the GraphQL name for this field, camelized unless `camelize: false` is provided
       attr_reader :name

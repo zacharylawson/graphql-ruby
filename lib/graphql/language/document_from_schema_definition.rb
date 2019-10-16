@@ -37,14 +37,39 @@ module GraphQL
       end
 
       def build_schema_node
+        ast_directives = @schema.ast_node ? @schema.ast_node.directives : []
+
         GraphQL::Language::Nodes::SchemaDefinition.new(
           query: warden.root_type_for_operation("query"),
           mutation: warden.root_type_for_operation("mutation"),
           subscription: warden.root_type_for_operation("subscription"),
-          # This only supports directives from parsing,
-          # use a custom printer to add to this list.
-          directives: @schema.ast_node ? @schema.ast_node.directives : [],
+          directives: build_directive_nodes(ast_directives),
         )
+      end
+
+      def build_directive_nodes(directives)
+        directives.map do |name, directive_value|
+          GraphQL::Language::Nodes::Directive.new(
+            name: name,
+            arguments: build_directive_arguments(directive_value.arguments),
+          )
+        end
+      end
+
+      def build_directive_arguments(arg_value)
+        case arg_value
+        when Hash
+          arg_value.map do |name, value|
+            GraphQL::Language::Nodes::Argument.new(
+              name: name,
+              value: build_directive_arguments(value),
+            )
+          end
+        when Array
+          arg_value.map { |a| build_directive_arguments(a) }
+        else
+          arg_value
+        end
       end
 
       def build_object_type_node(object_type)
@@ -148,7 +173,7 @@ module GraphQL
         )
       end
 
-      def build_directive_node(directive)
+      def build_directive_definition_node(directive)
         GraphQL::Language::Nodes::DirectiveDefinition.new(
           name: directive.graphql_name,
           arguments: build_argument_nodes(warden.arguments(directive)),
@@ -236,20 +261,20 @@ module GraphQL
           .sort_by(&:name)
       end
 
-      def build_directive_nodes(directives)
+      def build_directive_definition_nodes(directives)
         if !include_built_in_directives
           directives = directives.reject { |directive| directive.default_directive? }
         end
 
         directives
-          .map { |directive| build_directive_node(directive) }
+          .map { |directive| build_directive_definition_node(directive) }
           .sort_by(&:name)
       end
 
       def build_definition_nodes
         definitions = []
         definitions << build_schema_node if include_schema_node?
-        definitions += build_directive_nodes(warden.directives)
+        definitions += build_directive_definition_nodes(warden.directives)
         definitions += build_type_definition_nodes(warden.types)
         definitions
       end

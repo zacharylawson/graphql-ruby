@@ -40,6 +40,7 @@ require "graphql/schema/directive/include"
 require "graphql/schema/directive/skip"
 require "graphql/schema/directive/feature"
 require "graphql/schema/directive/transform"
+require "graphql/schema/directive_value"
 
 require "graphql/schema/resolver"
 require "graphql/schema/mutation"

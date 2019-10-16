@@ -21,6 +21,7 @@ module GraphQL
   class Schema
     class Enum < GraphQL::Schema::Member
       extend GraphQL::Schema::Member::AcceptsDefinition
+      extend GraphQL::Schema::Member::HasDirectives
 
       class << self
         extend Forwardable
