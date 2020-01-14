@@ -314,9 +314,8 @@ describe GraphQL::Schema::Object do
   end
 
   describe "when fields conflict with built-ins" do
-    it "warns when no override" do
-      expected_warning = "X's `field :method` conflicts with a built-in method, use `resolver_method:` to pick a different resolver method for this field (for example, `resolver_method: :resolve_method` and `def resolve_method`)\n"
-      assert_output "", expected_warning do
+    it "doesn't warn when no override" do
+      assert_output "", "" do
         Class.new(GraphQL::Schema::Object) do
           graphql_name "X"
           field :method, String, null: true

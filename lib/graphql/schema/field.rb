@@ -217,6 +217,12 @@ module GraphQL
           end
         end
 
+        override_name = method || hash_key || resolver_method
+        if CONFLICT_FIELD_NAMES.include?(name.to_sym) && CONFLICT_FIELD_NAMES.include?(override_name)
+          warn "#{owner.graphql_name}'s `field :#{name}` conflicts with a built-in method, use `resolver_method:` to pick a different resolver method for this field (for example, `resolver_method: :resolve_#{name}` and `def resolve_#{name}`)"
+        end
+
+
         # TODO: I think non-string/symbol hash keys are wrongly normalized (eg `1` will not work)
         method_name = method || hash_key || @underscored_name
         resolver_method ||= @underscored_name.to_sym
@@ -695,6 +701,22 @@ module GraphQL
           yield(obj, args)
         end
       end
+
+      # A list of Ruby keywords.
+      #
+      # @api private
+      RUBY_KEYWORDS = [:class, :module, :def, :undef, :begin, :rescue, :ensure, :end, :if, :unless, :then, :elsif, :else, :case, :when, :while, :until, :for, :break, :next, :redo, :retry, :in, :do, :return, :yield, :super, :self, :nil, :true, :false, :and, :or, :not, :alias, :defined?, :BEGIN, :END, :__LINE__, :__FILE__]
+
+      # A list of GraphQL-Ruby keywords.
+      #
+      # @api private
+      GRAPHQL_RUBY_KEYWORDS = [:context, :object, :method]
+
+      # A list of field names that we should advise users to pick a different
+      # resolve method name.
+      #
+      # @api private
+      CONFLICT_FIELD_NAMES = Set.new(GRAPHQL_RUBY_KEYWORDS + RUBY_KEYWORDS)
     end
   end
 end

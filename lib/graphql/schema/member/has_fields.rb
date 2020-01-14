@@ -39,29 +39,10 @@ module GraphQL
           end
         end
 
-        # A list of Ruby keywords.
-        #
-        # @api private
-        RUBY_KEYWORDS = [:class, :module, :def, :undef, :begin, :rescue, :ensure, :end, :if, :unless, :then, :elsif, :else, :case, :when, :while, :until, :for, :break, :next, :redo, :retry, :in, :do, :return, :yield, :super, :self, :nil, :true, :false, :and, :or, :not, :alias, :defined?, :BEGIN, :END, :__LINE__, :__FILE__]
-
-        # A list of GraphQL-Ruby keywords.
-        #
-        # @api private
-        GRAPHQL_RUBY_KEYWORDS = [:context, :object, :method]
-
-        # A list of field names that we should advise users to pick a different
-        # resolve method name.
-        #
-        # @api private
-        CONFLICT_FIELD_NAMES = Set.new(GRAPHQL_RUBY_KEYWORDS + RUBY_KEYWORDS)
-
         # Register this field with the class, overriding a previous one if needed.
         # @param field_defn [GraphQL::Schema::Field]
         # @return [void]
         def add_field(field_defn)
-          if CONFLICT_FIELD_NAMES.include?(field_defn.original_name) && field_defn.original_name == field_defn.resolver_method
-            warn "#{self.graphql_name}'s `field :#{field_defn.original_name}` conflicts with a built-in method, use `resolver_method:` to pick a different resolver method for this field (for example, `resolver_method: :resolve_#{field_defn.original_name}` and `def resolve_#{field_defn.original_name}`)"
-          end
           own_fields[field_defn.name] = field_defn
           nil
         end
