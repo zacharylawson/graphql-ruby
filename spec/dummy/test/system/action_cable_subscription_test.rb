@@ -50,7 +50,7 @@ class ActionCableSubscriptionsTest < ApplicationSystemTestCase
       # Make 3 subscriptions to the same payload
       click_on("Subscribe with fingerprint 1")
       sleep 5
-      raise page.html
+      puts page.html
 
       assert_selector "#fingerprint-updates-1-connected-1"
       click_on("Subscribe with fingerprint 1")
