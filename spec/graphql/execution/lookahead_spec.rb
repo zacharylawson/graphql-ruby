@@ -594,6 +594,31 @@ describe GraphQL::Execution::Lookahead do
       end
     end
 
+    describe "when the same field is executed with the same arguments but different aliases" do
+      let(:document) {
+        GraphQL.parse <<-GRAPHQL
+          query {
+            egret: findBirdSpecies(byName: "Great Egret") {
+              isWaterfowl
+            }
+            otherEgret: findBirdSpecies(byName: "Great Egret") {
+              name
+            }
+            findBirdSpecies(byName: "GreatEgret") {
+              __typename
+            }
+          }
+        GRAPHQL
+      }
+
+      it "distinguishes between the aliased fields" do
+        lookahead = query.lookahead
+        assert_equal [:is_waterfowl], lookahead.alias_selection("egret").selections.map(&:name)
+        assert_equal [:name], lookahead.alias_selection("otherEgret").selections.map(&:name)
+        assert_equal [:__typename], lookahead.alias_selection("findBirdSpecies").selections.map(&:name)
+      end
+    end
+
     describe "when field name is passed" do
       it "returns selection" do
         assert_selection_exists species_lookahead.alias_selection("similarSpecies")
