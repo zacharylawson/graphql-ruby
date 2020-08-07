@@ -100,6 +100,8 @@ end
 
 Interface classes are never instantiated. At runtime, only their `.resolve_type` methods are called (if they're defined).
 
+If you add an object type which implements an interface, but that object type doesn't properly appear in your schema, then you need to add that object to the interfaces's `orphan_types`.
+
 ### Implementing Interfaces
 
 To define object types that implement this interface use the `implements` method:
@@ -178,6 +180,7 @@ The type definition DSL uses this mechanism, too, so you can override those meth
 ### Resolve Type
 
 When a field's return type is an interface, GraphQL has to figure out what _specific_ object type to use for the return value. In the example above, each `customer` must be categorized as an `Individual` or `Company`. You can do this by:
+
 
 - Providing a top-level `Schema.resolve_type` method; _OR_
 - Providing an interface-level `.resolve_type` method in `definition_methods`.
